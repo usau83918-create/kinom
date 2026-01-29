@@ -4,11 +4,13 @@ const path = require('path');
 require('dotenv').config();
 
 // ================== MUHIM: .env faylini tekshirish ==================
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHANNEL_USERNAME = process.env.CHANNEL_USERNAME;
-const CHANNEL_ID = Number(process.env.CHANNEL_ID);
-const ADMIN_ID = Number(process.env.ADMIN_ID);
-const PRIVATE_CHANNEL_ID = Number(process.env.PRIVATE_CHANNEL_ID);
+
+
+const BOT_TOKEN = `8540792652:AAHTqikJgOKWiqlpnGHv9uWS9tPhhQv0Igw`;
+const CHANNEL_USERNAME = `@UzKinoPremiera`;
+const CHANNEL_ID = -1003707805152;
+const ADMIN_ID =7542365426;
+const PRIVATE_CHANNEL_ID = -1003415052995;
 
 // Muhim ma'lumotlar mavjudligini tekshirish
 if (!BOT_TOKEN) {
@@ -52,7 +54,6 @@ async function saveMovies(movies) {
         await fs.writeFile(MOVIES_FILE, JSON.stringify(movies, null, 2), 'utf8');
         return true;
     } catch (error) {
-        console.error('❌ Saqlashda xatolik:', error);
         return false;
     }
 }
@@ -62,7 +63,6 @@ let movies = {};
 
 (async () => {
     movies = await loadMovies();
-    console.log(`✅ ${Object.keys(movies).length} ta kino yuklandi`);
 })();
 
 // ================== VAQTINCHALIK MA'LUMOTLAR ==================
@@ -95,7 +95,6 @@ async function isUserMember(userId) {
         console.log(`👤 User ${userId} status: ${status}`);
         return status !== 'left' && status !== 'kicked';
     } catch (error) {
-        console.error('❌ A\'zolikni tekshirishda xatolik:', error.message);
         return false;
     }
 }
@@ -263,7 +262,6 @@ bot.on('message', async (msg) => {
     const firstName = msg.from.first_name || 'Foydalanuvchi';
     const text = msg.text;
 
-    console.log(`📨 Xabar qabul qilindi: "${text}" dan ${userId}`);
 
     try {
         // ================== ADMIN: KINO QO'SHISH ==================
@@ -469,7 +467,6 @@ Qaytadan /add ni bosing`
 
                 await bot.deleteMessage(chatId, loadingMsg.message_id);
             } catch (error) {
-                console.error('❌ Video yuborishda xatolik:', error);
                 await bot.deleteMessage(chatId, loadingMsg.message_id);
                 await bot.sendMessage(chatId, '❌ Video yuborishda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
             }
@@ -478,7 +475,6 @@ Qaytadan /add ni bosing`
         }
 
     } catch (error) {
-        console.error('❌ Xabarni qayta ishlashda xatolik:', error);
         await bot.sendMessage(chatId, '❌ Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     }
 });
