@@ -635,4 +635,155 @@ bot.on('message', async (msg) => {
                         chatId,
                         PRIVATE_CHANNEL_ID,
                         messageId
-       
+                    );  // ← 637-qator: QAVS YOPILDI! ✅
+
+                    if (!forwarded.video) {
+                        await bot.deleteMessage(chatId, loadingMsg.message_id);
+                        await bot.sendMessage(chatId, '❌ Bu message video emas!');
+                        return;
+                    }
+
+                    movies[movie.cod] = {
+                        title: movie.name,
+                        genre: movie.janr,
+                        year: movie.chiqarilgan_yili,
+                        country: movie.country,
+                        message_id: messageId,
+                        file_id: forwarded.video.file_id,
+                        added_date: new Date().toISOString()
+                    };
+
+                    const saved = await saveMovies(movies);
+
+                    await bot.deleteMessage(chatId, loadingMsg.message_id);
+
+                    if (saved) {
+                        const caption = createMovieCaption(movie, CHANNEL_USERNAME);
+
+                        await bot.sendVideo(chatId, forwarded.video.file_id, {
+                            caption,
+                            parse_mode: 'Markdown'
+                        });
+
+                        await bot.sendMessage(
+                            chatId, 
+                            `✅ *Kino muvaffaqiyatli qo'shildi!*\n\n💾 Jami kinolar: ${Object.keys(movies).length} ta`, 
+                            { parse_mode: 'Markdown' }
+                        );
+                    } else {
+                        await bot.sendMessage(chatId, '⚠️ Kino qo\'shildi lekin faylga saqlashda xatolik!');
+                    }
+
+                    delete tempData[userId];
+
+                } catch (err) {
+                    console.error('❌ Video olishda xatolik:', err);
+                    await bot.deleteMessage(chatId, loadingMsg.message_id);
+                    await bot.sendMessage(
+                        chatId, 
+                        `❌ Video topilmadi yoki bot yopiq kanalda admin emas!\n\nQaytadan /add ni bosing`
+                    );
+                }
+                return;
+            }
+            
+                }
+        if (text === '✅ Tekshirish') {
+            const loadingMsg = await bot.sendMessage(chatId, '⏳ Tekshirilmoqda...');
+            const isMember = await isUserMember(userId);
+            await bot.deleteMessage(chatId, loadingMsg.message_id);
+
+            if (isMember) {
+                await bot.sendMessage(chatId, '✅ Siz kanalga a\'zosiz!');
+                await sendWelcome(chatId, userId, firstName);
+            } else {
+                await bot.sendMessage(chatId, '❌ Siz hali kanalga a\'zo emassiz');
+            }
+            return;
+        }
+
+        const isMember = await isUserMember(userId);
+        if (!isMember) {
+            await sendWelcome(chatId, userId, firstName);
+            return;
+        }
+
+        // 📊 SO'ROVNOMA
+        if (text === '📊 So\'rovnoma') {
+            if (!surveys.active) {
+                await bot.sendMessage(chatId, '❌ Hozir faol so\'rovnoma yo\'q');
+                return;
+            }
+
+            await sendSurveyToUser(userId, chatId, surveys.active.question);
+            return;
+        }
+
+        // 📋 KINOLAR
+        if (text === '📋 Kinolar') {
+            const loadingMsg = await bot.sendMessage(chatId, '⏳ Yuklanmoqda...');
+
+            if (Object.keys(movies).length === 0) {
+                await bot.deleteMessage(chatId, loadingMsg.message_id);
+                await bot.sendMessage(chatId, '📂 Hozircha kinolar yo\'q');
+                return;
+            }
+
+            let list = '🎬 *KINOLAR RO\'YXATI*\n\n';
+            for (const [code, movie] of Object.entries(movies)) {
+                list += `━━━━━━━━━━━━━━━\n`;
+                list += `🔢 *Kod:* \`${code}\`\n`;
+                list += `🎬 *${movie.title}*\n`;
+                list += `🎭 ${movie.genre} | 📅 ${movie.year}\n`;
+                if (movie.country) list += `🌍 ${movie.country}\n`;
+                list += `\n`;
+            }
+            list += '━━━━━━━━━━━━━━━\n\n';
+            list += '💡 *Kino olish uchun kodini yuboring*';
+
+            await bot.deleteMessage(chatId, loadingMsg.message_id);
+            await bot.sendMessage(chatId, list, { parse_mode: 'Markdown' });
+            return;
+        }
+
+        // KINO KODI
+        const code = text.trim();
+        if (movies[code]) {
+            const movie = movies[code];
+
+            const loadingMsg = await bot.sendMessage(
+                chatId,
+                '⏳ *Yuklanmoqda...*\n\n📹 Video tayyorlanmoqda, iltimos kuting...',
+                { parse_mode: 'Markdown' }
+            );
+
+            try {
+                const movieInfo = {
+                    name: movie.title,
+                    janr: movie.genre,
+                    chiqarilgan_yili: movie.year,
+                    country: movie.country,
+                    cod: code
+                };
+                const caption = createMovieCaption(movieInfo, CHANNEL_USERNAME);
+
+                await bot.sendVideo(chatId, movie.file_id, {
+                    caption: caption,
+                    parse_mode: 'Markdown'
+                });
+
+                await bot.deleteMessage(chatId, loadingMsg.message_id);
+            } catch (error) {
+                await bot.deleteMessage(chatId, loadingMsg.message_id);
+                await bot.sendMessage(chatId, '❌ Video yuborishda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+            }
+        } else {
+            await bot.sendMessage(chatId, '❌ Bunday kod topilmadi!\n"📋 Kinolar" ni bosing');
+        }
+
+    } catch (error) {
+        console.error('Xatolik:', error);
+        await bot.sendMessage(chatId, '❌ Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+    }
+});
+            
