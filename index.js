@@ -10,7 +10,7 @@ const ADMIN_ID = 7542365426;
 const PRIVATE_CHANNEL_ID = -1003415052995;
 
 // 🆓 BEPUL AI VARIANT - OpenRouter (Google Gemini Flash - BEPUL!)
-const OPENROUTER_API_KEY = 'gen-lang-client-0992662313'; // https://openrouter.ai/keys dan oling
+const OPENROUTER_API_KEY = ''; // https://openrouter.ai/keys dan oling
 
 if (!BOT_TOKEN || !CHANNEL_ID || !ADMIN_ID) {
     
