@@ -10,10 +10,10 @@ const ADMIN_ID = 7542365426;
 const PRIVATE_CHANNEL_ID = -1003415052995;
 
 // 🆓 BEPUL AI VARIANT - OpenRouter (Google Gemini Flash - BEPUL!)
-const OPENROUTER_API_KEY = 'YOUR_OPENROUTER_API_KEY'; // https://openrouter.ai/keys dan oling
+const OPENROUTER_API_KEY = 'gen-lang-client-0992662313'; // https://openrouter.ai/keys dan oling
 
 if (!BOT_TOKEN || !CHANNEL_ID || !ADMIN_ID) {
-    console.error('❌ Konfiguratsiya xatosi!');
+    
     process.exit(1);
 }
 
@@ -100,7 +100,7 @@ const tempData = {};
 async function callFreeAI(prompt) {
     // Agar API key bo'lmasa, offline ishlaydi
     if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY') {
-        console.log('ℹ️ AI API yo\'q - offline mode');
+        
         return null;
     }
 
@@ -130,7 +130,7 @@ async function callFreeAI(prompt) {
         
         return null;
     } catch (error) {
-        console.error('❌ AI xatosi:', error);
+        
         return null;
     }
 }
